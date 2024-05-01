@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Assistant</title>
+</head>
+<body>
+    <h1>Delete Assistant</h1>
+
+    <form id="delete-form">
+        <label for="delete-id">Assistant ID:</label>
+        <input type="number" id="delete-id" name="delete-id" required><br><br>
+        <button type="submit">Delete</button>
+    </form>
+
+    <h2>Response</h2>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('delete-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const assistantId = document.getElementById('delete-id').value;
+            fetch(`/assistant/${assistantId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('response').textContent = 'Assistant deleted successfully';
+                } else {
+                    document.getElementById('response').textContent = 'Failed to delete assistant';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

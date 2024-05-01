@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Assistant</title>
+</head>
+<body>
+    <h1>Update Assistant</h1>
+
+    <form id="update-form">
+        <label for="update-id">Assistant ID:</label>
+        <input type="number" id="update-id" name="update-id"><br><br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" ><br><br>
+        <label for="mobile">Mobile:</label>
+        <input type="text" id="mobile" name="mobile"><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email"><br><br>
+        <label for="salary">Salary:</label>
+        <input type="number" id="salary" name="salary"><br><br>
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city"><br><br>
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country"><br><br>
+        <label for="department">Department:</label>
+        <input type="text" id="department" name="department"><br><br>
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role"><br><br>
+        <button type="submit">Update</button>
+    </form>
+
+    <h2>Response</h2>
+    <pre id="response"></pre>
+
+    <script>
+        document.getElementById('update-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const assistantId = formData.get('update-id');
+            fetch(`/assistant/${assistantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Set values from form data
+                    document.getElementById('name').value = formData.get('name') || '';
+                    document.getElementById('mobile').value = formData.get('mobile') || '';
+                    document.getElementById('email').value = formData.get('email') || '';
+                    document.getElementById('salary').value = formData.get('salary') || '';
+                    document.getElementById('city').value = formData.get('city') || '';
+                    document.getElementById('country').value = formData.get('country') || '';
+                    document.getElementById('department').value = formData.get('department') || '';
+                    document.getElementById('role').value = formData.get('role') || '';
+
+                    // Flush blank fields with previous details
+                    if (!formData.get('name')) document.getElementById('name').value = data.name || '';
+                    if (!formData.get('mobile')) document.getElementById('mobile').value = data.mobile || '';
+                    if (!formData.get('email')) document.getElementById('email').value = data.email || '';
+                    if (!formData.get('salary')) document.getElementById('salary').value = data.salary || '';
+                    if (!formData.get('city')) document.getElementById('city').value = data.city || '';
+                    if (!formData.get('country')) document.getElementById('country').value = data.country || '';
+                    if (!formData.get('department')) document.getElementById('department').value = data.department || '';
+                    if (!formData.get('role')) document.getElementById('role').value = data.role || '';
+                }).catch(error => console.error('Error:', error));
+
+            const updatedData = {
+                id: assistantId
+            };
+
+            // Add fields to updatedData only if they are non-empty
+            if (formData.get('name')) updatedData.name = formData.get('name');
+            if (formData.get('mobile')) updatedData.mobile = formData.get('mobile');
+            if (formData.get('email')) updatedData.email = formData.get('email');
+            if (formData.get('salary')) updatedData.salary = formData.get('salary');
+            if (formData.get('city')) updatedData.city = formData.get('city');
+            if (formData.get('country')) updatedData.country = formData.get('country');
+            if (formData.get('department')) updatedData.department = formData.get('department');
+            if (formData.get('role')) updatedData.role = formData.get('role');
+
+            // Send updatedData to Flask app
+            fetch(`/assistant/${assistantId}`, {
+                method: 'PUT',
+                body: JSON.stringify(updatedData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('response').textContent = 'Assistant updated successfully';
+                } else {
+                    document.getElementById('response').textContent = 'Failed to update assistant';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Automatically fetch details when assistant ID is changed
+        document.getElementById('update-id').addEventListener('change', function() {
+            document.getElementById('update-form').dispatchEvent(new Event('submit'));
+        });
+    </script>
+</body>
+</html>
